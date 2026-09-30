@@ -1,0 +1,16 @@
+# Used only inside the Airflow container (mounted to DBT_PROFILES_DIR).
+# Host is "warehouse" -- the docker-compose service name -- not localhost,
+# because this runs container-to-container over Docker's internal network,
+# not through the 5433 port mapping you use from Windows.
+cmapss_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('CMAPSS_DB_HOST', 'warehouse') }}"
+      port: "{{ env_var('CMAPSS_DB_PORT', '5432') | as_number }}"
+      user: "{{ env_var('CMAPSS_DB_USER', 'cmapss') }}"
+      password: "{{ env_var('CMAPSS_DB_PASSWORD', 'cmapss_pw') }}"
+      dbname: "{{ env_var('CMAPSS_DB_NAME', 'cmapss') }}"
+      schema: staging
+      threads: 4

@@ -1,0 +1,15 @@
+# Copy this to ~/.dbt/profiles.yml (or pass --profiles-dir pointing here).
+# Never commit a profiles.yml with real credentials to source control.
+
+cmapss_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('CMAPSS_DB_HOST', 'localhost') }}"
+      port: "{{ env_var('CMAPSS_DB_PORT', '5432') | as_number }}"
+      user: "{{ env_var('CMAPSS_DB_USER', 'cmapss') }}"
+      password: "{{ env_var('CMAPSS_DB_PASSWORD', 'cmapss_pw') }}"
+      dbname: "{{ env_var('CMAPSS_DB_NAME', 'cmapss') }}"
+      schema: staging   # dbt overrides this per-model via +schema config
+      threads: 4

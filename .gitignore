@@ -1,0 +1,28 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Raw dataset -- large, and NASA's to distribute, not this repo's
+data/raw/*.txt
+!data/raw/.gitkeep
+
+# dbt
+dbt/cmapss_dbt/target/
+dbt/cmapss_dbt/dbt_packages/
+dbt/cmapss_dbt/logs/
+
+# Airflow container state (metadata db, logs) -- lives in a Docker volume,
+# never actually written to the repo folder, but ignored just in case
+airflow_home/
+*.log
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Never commit real credentials if these get copied from the *_example files
+.dbt/profiles.yml

@@ -1,0 +1,61 @@
+# Warehouse (Postgres) + dashboard (Grafana) + orchestration (Airflow).
+# Airflow runs as its own container (see Dockerfile.airflow) because
+# Airflow doesn't run natively on Windows -- Docker keeps the whole
+# pipeline runnable with one `docker compose up -d`, regardless of host OS.
+
+services:
+  warehouse:
+    image: postgres:16
+    container_name: cmapss_warehouse
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cmapss
+      POSTGRES_PASSWORD: cmapss_pw   # local dev only - never commit real creds
+      POSTGRES_DB: cmapss
+    ports:
+      - "5433:5432"   # host:container - 5433 avoids clashing with a native Postgres install on 5432
+    volumes:
+      - cmapss_pgdata:/var/lib/postgresql/data
+      - ./init_sql:/docker-entrypoint-initdb.d   # auto-runs schema creation on first boot
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cmapss_grafana
+    restart: unless-stopped
+    depends_on:
+      - warehouse
+    ports:
+      - "3000:3000"
+    volumes:
+      - cmapss_grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning   # pre-configures the Postgres datasource
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: cmapss_airflow
+    restart: unless-stopped
+    depends_on:
+      - warehouse
+    command: standalone   # single-container mode: webserver + scheduler + a SQLite metadata db, good enough for a portfolio project (not for production)
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/project/dags
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      DBT_PROFILES_DIR: /opt/airflow/project/dbt_profiles
+      # Container-to-container connection -- 5432, not the 5433 you use from Windows
+      CMAPSS_DB_HOST: warehouse
+      CMAPSS_DB_PORT: "5432"
+      CMAPSS_DB_USER: cmapss
+      CMAPSS_DB_PASSWORD: cmapss_pw
+      CMAPSS_DB_NAME: cmapss
+    volumes:
+      - ./:/opt/airflow/project              # whole repo -- DAG, scripts, dbt project, data/raw
+      - cmapss_airflow_data:/opt/airflow      # Airflow's own metadata db + logs, survives restarts
+
+volumes:
+  cmapss_pgdata:
+  cmapss_grafana_data:
+  cmapss_airflow_data:

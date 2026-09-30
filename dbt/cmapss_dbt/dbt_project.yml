@@ -1,0 +1,28 @@
+name: "cmapss_dbt"
+version: "1.0.0"
+config-version: 2
+
+profile: "cmapss_dbt"
+
+model-paths: ["models"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  cmapss_dbt:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+
+# Tunable without touching SQL. Starting points, to be calibrated against
+# the lead-time table (see README): change here, then `dbt run`.
+vars:
+  baseline_cycles: 10
+  healthy_threshold: 0.70   # health >= this -> healthy
+  watch_threshold: 0.45     # health >= this -> watch, below -> critical

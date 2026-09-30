@@ -1,0 +1,6 @@
+# Airflow's own image, plus the handful of extra packages the DAG's tasks
+# need at runtime (the load script's dependencies, and dbt itself).
+FROM apache/airflow:3.3.2-python3.11
+
+COPY requirements-airflow.txt /requirements-airflow.txt
+RUN pip install --no-cache-dir -r /requirements-airflow.txt

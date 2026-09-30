@@ -1,0 +1,33 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: sensor_readings
+        description: "As-ingested C-MAPSS sensor readings, loaded by scripts/load_raw_data.py"
+        columns:
+          - name: unit_number
+            tests:
+              - not_null
+          - name: time_in_cycles
+            tests:
+              - not_null
+
+models:
+  - name: stg_cmapss__sensors
+    description: "Cleaned, typed C-MAPSS sensor readings. One row per engine per cycle."
+    columns:
+      - name: unit_number
+        description: "Engine identifier, unique within a dataset_id"
+        tests:
+          - not_null
+      - name: time_in_cycles
+        description: "Operational cycle number for this engine"
+        tests:
+          - not_null
+      - name: dataset_id
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["FD001", "FD002", "FD003", "FD004"]

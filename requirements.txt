@@ -1,0 +1,6 @@
+apache-airflow>=3.0,<4.0
+apache-airflow-providers-standard
+pandas>=2.0
+sqlalchemy>=2.0
+psycopg2-binary>=2.9
+dbt-postgres>=1.8
