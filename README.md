@@ -11,11 +11,11 @@ does that actually give a maintenance team?
 
 ## Screenshots
 
-!\[Fleet health dashboard](docs/dashboard.png.png)
+![Fleet health dashboard](docs/dashboard.png)
 *Grafana dashboard: per-engine health trend, warning lead time, zone
 distribution, and fleet-level headline stats.*
 
-!\[Airflow DAG run](docs/airflow\_dag.png.png)
+![Airflow DAG run](docs/airflow_dag.png)
 *Airflow orchestrating extract → dbt run → dbt test, including a
 scheduled (unattended) run alongside a manual trigger.*
 
